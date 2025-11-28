@@ -19,11 +19,11 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    profilePicture:{
+    profile:{
         type: String,
         required: true
     },
-    profilePictureId:{
+    profilePublicId:{
         type: String,
         reuired: true
     },
