@@ -157,3 +157,7 @@ const updateProfile = asyncHandler(async(req, res) =>{
 
     
 })
+
+/*const deleteAccount = asyncHandler(async(req, res) =>{
+
+})*/
