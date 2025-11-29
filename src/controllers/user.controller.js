@@ -3,6 +3,7 @@ const apiResponse = require("../utils/apiResponse.js");
 const asyncHandler = require("../utils/asyncHandler.js");
 const User = require("../models/user.model.js");
 const jwt = require("jsonwebtoken");
+const cloudnary = require("cloudinary").v2
 const uploadImgToCloudnary = require("../config/cloudnary.js");
 const upload = require("../middlewares/multer.middleware.js");
 
@@ -155,5 +156,46 @@ const updateProfile = asyncHandler(async(req, res) =>{
         throw new apiError(400, "Profile is required")
     }
 
+    const user = await User.findById(userId)
+    if(!user){
+        throw new apiError(404, "User not found")
+
+    }
+
+    if(user.profilePublicId){
+        try{
+            await cloudnary.uploader.destroy(user.profilePublicId, {resource_type: Image});
+        }catch(error){
+            throw new apiError(500, "Something went wrong during the process")
+
+        }
+    }
+
+        const profile = await uploadImgToCloudnary(profileLocalPath)
+        if(profile.secure_url || profile.public_id){
+            throw new apiError(400, "Failed to upload image, try again later")
+        }
+
+        const updateUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                $set:
+                {
+                    profile: profile.secure_url,
+                    profilePublicId: profile.public_id
+                }
+            },
+            {new: true}
+        );
+        return res.status(200).json(new apiResponse(200, updateUser, "Profile updated successfully"))
     
 })
+
+module.exports ={
+    registerUser,
+    loginUser,
+    logoutUser,
+    refreshAccessToken,
+    changePassword,
+    updateProfile 
+}
