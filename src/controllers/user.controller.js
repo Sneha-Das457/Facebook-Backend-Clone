@@ -192,12 +192,39 @@ const updateProfile = asyncHandler(async(req, res) =>{
 })
 
 
+const deleteAccount = asyncHandler(async(req, res) =>{
+    const userId = req.user._id
+    const {password} = req.body
+    if(!password){
+        throw new apiError(404, "Password is required")
+    }
+
+     const user = await User.findById(userId)
+    if(!user){
+        throw new apiError(404, "User not found!")
+    }
+
+    const checkPassword = await user.isPasswordCorrect(password)
+    if(!changePassword){
+        throw new apiError(400, "Incorrect Password")
+    }
+
+    const deletedUser = await User.findByIdAndDelete(userId)
+    return res.status(200).json(new apiResponse(200, deletedUser, "Account has been deleted sucessfully"))
+});
+
+
+/*const fetchAccountDetails = asyncHandler(async(req, res) =>{
+
+})*/
+
 module.exports ={
     registerUser,
     loginUser,
     logoutUser,
     refreshAccessToken,
     changePassword,
-    updateProfile 
+    updateProfile,
+    deleteAccount 
 }
 
