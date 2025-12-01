@@ -24,4 +24,24 @@ const uploadImgToCloudnary = async(localFilePath) =>{
         fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath)
     }
 }
+
+const uploadVideoToCloudnary = async(localFilePath) =>{
+    if(!localFilePath){
+        return null
+    }
+    try{
+        const response = await cloudnary.uploader.upload(localFilePath, {
+            resource_type: "video"
+
+        })
+    }catch(error){
+        console.log("Failed to upload", error.message)
+    }finally{
+        fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath)
+    }
+
+}
+
+
 module.exports = uploadImgToCloudnary;
+module.exports = uploadVideoToCloudnary;

@@ -54,7 +54,7 @@ const registerUser = asyncHandler(async(req, res) =>{
 
     return res.status(200).json(new apiResponse(200, createdUser, "User registered sucessfully"))
 
-})
+});
 
 const loginUser = asyncHandler(async(req, res) =>{
     const {userName, email, password} = req.body
@@ -80,7 +80,13 @@ const loginUser = asyncHandler(async(req, res) =>{
 
     return res.status(200).cookie("refreshToken", refreshToken, option).cookie("accessToken", accessToken, option).json(new apiResponse(200, {use: loggedInUser, accessToken, refreshToken}, "Login successfull"))
     
-})
+});
+
+
+const getExistingUser = asyncHandler(async(req, res) =>{
+    return res.status(200).json(new apiResponse(200, req.user, "This is you profile"))
+});
+
 
 const logoutUser = asyncHandler(async(req, res) =>{
     await User.findByIdAndUpdate(
@@ -98,7 +104,7 @@ const logoutUser = asyncHandler(async(req, res) =>{
     }
 
     return res.status(200).clearCookie("accessToken", option).clearCookie("refreshToken", option).json(new apiResponse(200, "", "User loggedout successfull!"))
-})
+});
 
 const refreshAccessToken = asyncHandler(async(req, res) =>{
     const receivedRefreshToken = req.cookie.refreshToken || req.body.refreshToken
@@ -130,7 +136,7 @@ const refreshAccessToken = asyncHandler(async(req, res) =>{
     }catch(error){
         throw new apiError(500, error.message)
     }
-})
+});
 
 const changePassword = asyncHandler(async(req, res) =>{
     const {oldPassword, newPassword, confirmPassword} = req.body
@@ -147,7 +153,29 @@ const changePassword = asyncHandler(async(req, res) =>{
     user.newPassword = newPassword
     await user.save({validateBeforeSave: false})
     return res.status(200).json(new apiResponse(200, "Password changed sucessfully"))
-})
+});
+
+
+const updateAccount = asyncHandler(async(req, res) =>{
+    const {email, userName, fullName} = req.body
+    if(!email || !userName){
+        throw new apiError(400, "All fields are required")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                email,
+                userName
+
+            }
+        },
+        {new: true}
+    ).select("-password")
+
+    return res.status(200).json(new apiResponse(200, user, "Your account details are updated successfully"))
+});
 
 const updateProfile = asyncHandler(async(req, res) =>{
     const profileLocalPath = req.file?.path
@@ -189,6 +217,29 @@ const updateProfile = asyncHandler(async(req, res) =>{
         );
         return res.status(200).json(new apiResponse(200, updateUser, "Profile updated successfully"))
     
+});
+
+
+const removeProfile = asyncHandler(async(req, res) =>{
+    const profileLocalPath = req.file?.path
+    if(!profileLocalPath){
+        throw new apiError(404,"Profile is required!")
+    }
+    const userId = req.user._id
+    const user = await User.findById(userId)
+    if(!user){
+        throw new apiError(404, "User does not exist!")
+    }
+
+    if(user.profilePublicId){
+        try{
+            await cloudnary.uploader.destroy(user.profilePublicId, {resource_type: Image})
+        }catch(error){
+            throw new apiError(500, "Something went wrong. Try again later")
+        }
+    }
+
+    return res.status(200).json(new apiResponse(200, "Profile removed successfully"))
 })
 
 
@@ -214,6 +265,8 @@ const deleteAccount = asyncHandler(async(req, res) =>{
 });
 
 
+
+
 /*const fetchAccountDetails = asyncHandler(async(req, res) =>{
 
 })*/
@@ -225,6 +278,9 @@ module.exports ={
     refreshAccessToken,
     changePassword,
     updateProfile,
-    deleteAccount 
+    removeProfile,
+    deleteAccount,
+    getExistingUser, 
+    updateAccount 
 }
 
