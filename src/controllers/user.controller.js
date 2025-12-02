@@ -84,7 +84,13 @@ const loginUser = asyncHandler(async(req, res) =>{
 
 
 const getExistingUser = asyncHandler(async(req, res) =>{
-    return res.status(200).json(new apiResponse(200, req.user, "This is you profile"))
+       const userId = req.user._id
+       const user = await User.findById(userId).select("-password")
+       if(!user){
+        throw new apiError(400, "User not found")
+       }
+    
+    return res.status(200).json(new apiResponse(200, user, "This is you profile"))
 });
 
 
@@ -265,11 +271,22 @@ const deleteAccount = asyncHandler(async(req, res) =>{
 });
 
 
+const seeAnotherProfile = asyncHandler(async(req, res) =>{
+    const {userName} = req.body
+    if(!userName){
+        throw new apiError(401, "user name is required")
+    }
 
+    const user = await User.findOne([{userName}]).select("-password -email -refreshToken");
+    if(!user){
+        
+          throw new apiError(404, "User not found")
+    }
+ 
 
-/*const fetchAccountDetails = asyncHandler(async(req, res) =>{
+    return res.status(200).json(new apiResponse(200, user, "User profile is found"))
 
-})*/
+});
 
 module.exports ={
     registerUser,
@@ -281,6 +298,7 @@ module.exports ={
     removeProfile,
     deleteAccount,
     getExistingUser, 
-    updateAccount 
+    updateAccount,
+    seeAnotherProfile, 
 }
 

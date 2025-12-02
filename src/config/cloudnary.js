@@ -43,5 +43,7 @@ const uploadVideoToCloudnary = async(localFilePath) =>{
 }
 
 
-module.exports = uploadImgToCloudnary;
-module.exports = uploadVideoToCloudnary;
+module.exports = {
+    uploadImgToCloudnary,
+    uploadVideoToCloudnary
+}
