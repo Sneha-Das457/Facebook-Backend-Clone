@@ -7,8 +7,6 @@ const cloudnary = require("cloudinary").v2
 const uploadImgToCloudnary = require("../config/cloudnary.js");
 const upload = require("../middlewares/multer.middleware.js");
 
-
-
 const generateAccessAndrefreshToken = async(userId) =>{
     const user = await User.findById(userId)
     const accessToken = user.generateAccessToken()

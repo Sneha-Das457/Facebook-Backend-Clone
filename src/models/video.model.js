@@ -4,7 +4,7 @@ const mongooseAgreegatePaginate = require("mongoose-agregate-paginate-v2")
 
 const videoSchema = new Schema({
     
-    owner:{
+    user:{
         type: Schema.Types.ObjectId,
         ref: "User"
     },
@@ -17,6 +17,7 @@ const videoSchema = new Schema({
         type: String,
         required: true
     },
+    
     thumbnail:{
         type: String,
         required: true
