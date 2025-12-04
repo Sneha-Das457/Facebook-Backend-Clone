@@ -156,9 +156,23 @@ const deleteVideo = asyncHandler(async(req, res) =>{
 
 });
 
+const togglePublicStatus = asyncHandler(async(req, res) =>{
+    const {videoId} = req.params
+    const video = await Video.findById(videoId)
+    if(!video){
+        throw new apiError(404, "Video not found")
+    }
+
+    video.isPublished = !video.isPublished;
+    await video.save()
+
+    return res.status(200).json(new apiResponse(200, video, "Published has been toggled successfully"))
+})
+
 module.exports = {
     createVideo,
     getVideo,
     editVideo,
-    deleteVideo
+    deleteVideo,
+    togglePublicStatus
 }
