@@ -22,7 +22,7 @@ const registerUser = asyncHandler(async(req, res) =>{
     if(!fullName || !emil || !password || !userName){
         throw new apiError(400, "All fields are required")
     }
-    const checkExistingUser = await User.findOne({$or [{userName}, {emil}]});
+    const checkExistingUser = await User.findOne({$or: [{userName}, {emil}]});
     if(checkExistingUser){
         throw new apiError(409, "User already exist")
     }
@@ -269,7 +269,7 @@ const deleteAccount = asyncHandler(async(req, res) =>{
 });
 
 
-const seeAnotherProfile = asyncHandler(async(req, res) =>{
+const seeProfile = asyncHandler(async(req, res) =>{
     const {userName} = req.body
     if(!userName){
         throw new apiError(401, "user name is required")
@@ -282,7 +282,15 @@ const seeAnotherProfile = asyncHandler(async(req, res) =>{
     }
  
 
-    return res.status(200).json(new apiResponse(200, user, "User profile is found"))
+    const loggedInUserName = req.user.userName;
+
+    if(userName === loggedInUserName){
+        return res.status(200).json(new apiResponse(200, user, "This is your own profile"))
+    }
+
+    return res.status(200).json(new apiResponse(200, user, "This is aother person's profile"))
+
+
 
 });
 
@@ -297,6 +305,6 @@ module.exports ={
     deleteAccount,
     getExistingUser, 
     updateAccount,
-    seeAnotherProfile, 
+    seeProfile, 
 }
 

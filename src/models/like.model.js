@@ -2,7 +2,12 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 const likeSchema = new Schema({
-
+     
+    Like:{
+        type: Number,
+        default: 0,
+        required: true
+    },
 
     video:{
         type: Schema.Types.ObjectId,

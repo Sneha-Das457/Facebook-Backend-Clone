@@ -4,7 +4,7 @@ const mongooseAgreegatePaginate = require("mongoose-agregate-paginate-v2")
 
 const videoSchema = new Schema({
     
-    user:{
+    owner:{
         type: Schema.Types.ObjectId,
         ref: "User"
     },
@@ -41,7 +41,18 @@ const videoSchema = new Schema({
     view:{
         type: Number,
         default: 0
+    },
+    isPublished:{
+        type: Boolean,
+        required: true
+    },
+
+    isLikeCountPublic:{
+        type: Boolean,
+        required: true
     }
+
+
 }, {timestamps: true})
 
 videoSchema.plugin(mongooseAgreegatePaginate)

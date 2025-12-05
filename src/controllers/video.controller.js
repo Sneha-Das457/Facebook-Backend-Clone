@@ -46,7 +46,7 @@ const createVideo = asyncHandler(async(req, res) =>{
         description,
         videoFile: video?.secure_url || video.url,
         videoFilePublicId: video?.public_id, 
-        thumbnail: thumbnail?secure_url || thumbnail.url,
+        thumbnail: thumbnail?.secure_url || thumbnail.url,
         thumbnailPublicId: thumbnail.public_id,
         user: req.user._id
         
