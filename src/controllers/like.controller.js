@@ -78,7 +78,7 @@ const toggleLikePublicStatus = asyncHandler(async(req, res) =>{
         throw new apiError(400, "Video not found")
     }
 
-    if(video.owner !== userId){
+    if(video.owner.toString() !== userId){
         throw new apiError(400, "You are not the owner, you can not change the visibility")
     }
 
