@@ -88,7 +88,7 @@ const disabeledCommentSection = asyncHandler(async(req, res) =>{
         throw new apiError(404, "You are not the owner of this video, you can't change the setting")
     }
 
-    video.offComment = !video.offComment;
+    video.turnedOffComment = !video.turnedOffComment;
     await video.save();
 
     return res.status(200).json(new apiResponse(200, null, "The comment section of this video has been turned off successfully"))

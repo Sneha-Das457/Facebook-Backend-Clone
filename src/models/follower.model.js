@@ -7,11 +7,19 @@ const followerSchema = new Schema({
         type: Number,
         default: 0
     },
-    user:{
+
+    profile:{
         type: Schema.Types.ObjectId,
         ref: "User"
+    },
+    
+    follwing:{
+        type: Number,
+        default: 0
+
     }
+
 }, {timestamps: true})
 
 const Follwer = mongoose.model("Follwer", followerSchema);
-module.exports = Follwer
+module.exports = Follwer;

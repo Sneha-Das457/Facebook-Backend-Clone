@@ -18,7 +18,7 @@ const commentSchema = new Schema({
         required: true
     },
     
-    offComment:{
+    turnedOffComment:{
         type:Boolean,
         default: false
     }
