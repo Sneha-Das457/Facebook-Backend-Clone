@@ -42,3 +42,16 @@ const getProfileFollwers = asyncHandler(async(req, res) =>{
 
     return res.status(200).json(new apiResponse(200, null, "this profile's follwers has been fetch successfully" ))
 });
+
+/*const getFollwingProfile = asyncHandler(async(req, res) =>{
+    const {follwingID} = req.user._id
+
+    const follwingProfile = await Follwer.find({
+        follwing: follwingID
+    }).populate()
+})*/
+
+module.exports = {
+    toggleFollwers,
+    getProfileFollwers
+}
