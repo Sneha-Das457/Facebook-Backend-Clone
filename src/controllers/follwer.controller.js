@@ -43,15 +43,22 @@ const getProfileFollwers = asyncHandler(async(req, res) =>{
     return res.status(200).json(new apiResponse(200, null, "this profile's follwers has been fetch successfully" ))
 });
 
-/*const getFollwingProfile = asyncHandler(async(req, res) =>{
-    const {follwingID} = req.user._id
+const getFollwingAccounts = asyncHandler(async(req, res) =>{
+    const {follwerID} = req.user._id
 
-    const follwingProfile = await Follwer.find({
-        follwing: follwingID
-    }).populate()
-})*/
+    const follwingAccounts = await Follwer.find({
+        follwer: follwingID
+    }).populate("follwer", "username")
+
+    if(follwingAccounts.length === 0){
+        throw new apiError(400, "You haven't follwed any accounts yet..")
+    }
+
+    return res.status(200).json(new apiResponse(200, follwingAccounts, "All the follwed Accounts has been fetch successfully"))
+})
 
 module.exports = {
     toggleFollwers,
-    getProfileFollwers
+    getProfileFollwers,
+    getFollwingAccounts
 }
