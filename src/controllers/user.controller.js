@@ -178,7 +178,7 @@ const updateAccount = asyncHandler(async(req, res) =>{
         {new: true}
     ).select("-password")
 
-    return res.status(200).json(new apiResponse(200, user, "Your account details are updated successfully"))
+    return res.status(200).json(new apiResponse(200, user, "Your account details has been updated successfully"))
 });
 
 const updateProfile = asyncHandler(async(req, res) =>{

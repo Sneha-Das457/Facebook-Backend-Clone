@@ -7,7 +7,7 @@ const toggleFollwers = asyncHandler(async(req, res) =>{
     const {profileId} = req.params;
     const {followerId} = req.user._id;
 
-    if(profileId.toString() === followerId){
+    if(profileId.toString() === followerId.toString()){
         throw new apiError(400, "This is your own Id, you can't follow it")
     }
 
@@ -55,7 +55,7 @@ const getFollwingAccounts = asyncHandler(async(req, res) =>{
     }
 
     return res.status(200).json(new apiResponse(200, follwingAccounts, "All the follwed Accounts has been fetch successfully"))
-})
+});
 
 module.exports = {
     toggleFollwers,

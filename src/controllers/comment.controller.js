@@ -32,17 +32,17 @@ const editComment = asyncHandler(async(req, res) =>{
     const {content, videoId} = req.body;
     const {commentId} = req.params;
 
-    const video = await Video.findById(commentId);
+    const video = await Video.findById(videoId);
     if(!video){
         throw new apiError(400, "Video not found")
     }
 
-    const comment = await Comment.findById(comment)
-    if(comment.length === 0){
+    const comment = await Comment.findById(commentId)
+    if(!comment){
         throw new apiError(400, "Comment not found")
     }
 
-    if(comment.video.toString() === comment){
+    if(comment.video._id.toString() !== video._id.toString()){
         throw new apiError("This comment is not belong to this video")
     }
 
@@ -62,17 +62,17 @@ const deleteComment = asyncHandler(async(req, res) =>{
     }
 
     const comment = await Comment.findById(commentId)
-    if(comment.length === 0){
+    if(!comment){
         throw new apiError(401, "Comment not found")
     }
 
-    if(comment.video.toString() !== videoId){
+    if(comment.video._id.toString() !== video._id.toString()){
         throw new apiError(404, "This comment does't belong to this video")
     }
 
-    const removeComment = await Comment.findByIdAndDelete(commentId);
+    await Comment.findByIdAndDelete(commentId);
 
-    return res.status(200).json(new apiResponse(200, removeComment, "Comment has been deleted successfully"));
+    return res.status(200).json(new apiResponse(200, null, "Comment has been deleted successfully"));
 });
 
 const disabeledCommentSection = asyncHandler(async(req, res) =>{
@@ -84,7 +84,7 @@ const disabeledCommentSection = asyncHandler(async(req, res) =>{
         throw new apiError(404, "Video not found")
     }
 
-    if(video.owner.toString() !== userId){
+    if(video.owner._id.toString() !== userId.toString()){
         throw new apiError(404, "You are not the owner of this video, you can't change the setting")
     }
 
