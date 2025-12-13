@@ -74,6 +74,18 @@ const getVideo = asyncHandler(async(req, res) =>{
     return res.status(200).json(new apiResponse(200, "Video has been fetched successfully"))
 });
 
+
+const gettAllVideos = asyncHandler(async(req, res) =>{
+    const { page = 1, limit = 10, query, userId } = req.query;
+    const sortBy = req.query.sortBy || 'createdAt';
+    const sortType = req.query.sortType === "asc" ? 1: -1;
+
+    const filter = {};
+    
+
+})
+
+
 const editVideo = asyncHandler(async(req, res) =>{
     const {videoId} = req.params;
     const {title, description} = req.body;
@@ -170,6 +182,7 @@ const togglePublicStatus = asyncHandler(async(req, res) =>{
 })
 
 module.exports = {
+    
     createVideo,
     getVideo,
     editVideo,
