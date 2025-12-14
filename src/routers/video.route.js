@@ -5,6 +5,7 @@ const verifyUser = require('../middlewares/user.middleware.js');
 const  {
     createVideo,
     getVideo,
+    gettAllVideos,
     editVideo,
     deleteVideo,
     togglePublicStatus
@@ -20,6 +21,14 @@ router.post('/create-video', verifyUser, upload.fields([
         maxCount: 1
     }
 ]), createVideo);
+
+router.get("/all-videos", verifyUser, gettAllVideos);
+router.get("/video/:videoId", verifyUser, getVideo);
+router.put("/edit-video/:videoId", verifyUser, upload.single('thumbnail'), editVideo);
+router.patch("/toggle-public-status/:videoId", verifyUser, togglePublicStatus);
+router.delete("/delet-video/:videoId", verifyUser, deleteVideo);
+
+module.exports = router;
 
 
 

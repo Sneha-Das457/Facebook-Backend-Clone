@@ -199,6 +199,7 @@ module.exports = {
     
     createVideo,
     getVideo,
+    gettAllVideos,
     editVideo,
     deleteVideo,
     togglePublicStatus
