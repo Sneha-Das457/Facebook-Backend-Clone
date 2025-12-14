@@ -81,7 +81,21 @@ const gettAllVideos = asyncHandler(async(req, res) =>{
     const sortType = req.query.sortType === "asc" ? 1: -1;
 
     const filter = {};
-    
+    if(userId) filter.owner = userId;
+    if(query) filter.title = { $regex: query, $options: "i" };
+
+    const pageNum = Number(page) || 1;
+    const limitNum = Number(limit) || 10;
+    const video = await Video.find(filter)
+    .sort({ [sortBy]: sortType})
+    .skip((pageNum -1) *limitNum)
+    .limit(limitNum);
+
+    if(!video){
+        throw new apiError(404, "there is no videos exist")
+    }
+
+    return res.status(200).json(new apiResponse(200, video, "All the videos has been fetched successfully"));
 
 })
 
