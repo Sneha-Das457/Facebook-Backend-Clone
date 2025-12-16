@@ -476,5 +476,5 @@ module.exports = {
   updateAccount,
   seeProfile,
   getUserProfileDetails,
-  getExistingUser
+  getExistingUser,
 };
