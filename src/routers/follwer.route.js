@@ -5,7 +5,7 @@ const {
   toggleFollwers,
   getProfileFollwers,
   getFollwingAccounts,
-} = require("../controllers/comment.controller.js");
+} = require("../controllers/follwer.controller.js");
 
 router.post("/:profileId/toggle", verifyUser, toggleFollwers);
 router.get("/:profileId/follwers", verifyUser, getProfileFollwers);

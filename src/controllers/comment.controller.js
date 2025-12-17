@@ -1,6 +1,5 @@
 const Comment = require("../models/comment.model.js");
 const Video = require("../models/video.model.js");
-const Comment = require("../models/comment.model.js");
 const asyncHandler = require("../utils/asyncHandler.js");
 const apiResponse = require("../utils/apiResponse.js");
 const apiError = require("../utils/apiError.js");

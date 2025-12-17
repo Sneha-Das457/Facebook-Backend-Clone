@@ -4,7 +4,6 @@ const Comment = require("../models/comment.model.js");
 const asyncHandler = require("../utils/asyncHandler.js");
 const apiResponse = require("../utils/apiResponse.js");
 const apiError = require("../utils/apiError.js");
-const { use } = require("react");
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
