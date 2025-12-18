@@ -20,7 +20,7 @@ router.post(
   "/register",
   upload.fields([
     {
-      name: "Profile",
+      name: "profile",
       maxCount: 1,
     },
   ]),

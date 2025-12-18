@@ -18,20 +18,26 @@ const generateAccessAndrefreshToken = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { fullName, emil, password, userName } = req.body;
-  if (!fullName || !emil || !password || !userName) {
+  const { fullName, email, password, userName } = req.body;
+  if (!fullName || !email || !password || !userName) {
     throw new apiError(400, "All fields are required");
   }
   const checkExistingUser = await User.findOne({
-    $or: [{ userName }, { emil }],
+    $or: [{ userName }, { email }],
   });
   if (checkExistingUser) {
     throw new apiError(409, "User already exist");
   }
-  const profileLocalPath = req.files?.profile[0]?.path;
-  if (!profileLocalPath) {
-    throw new apiError(409, "Profile path is required");
-  }
+  try {
+    const profileLocalPath = req.files?.profile?.[0]?.path;
+
+    if (!profileLocalPath) {
+      throw new apiError(409, "Profile path is required");
+    }
+
+  } catch (error) {
+    next(error);
+} 
 
   const profile = await uploadImgToCloudnary(profileLocalPath);
   if (!profile) {
