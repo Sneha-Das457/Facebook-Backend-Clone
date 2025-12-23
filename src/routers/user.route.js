@@ -12,6 +12,8 @@ const {
   getExistingUser,
   updateAccount,
   seeProfile,
+  getUserProfileDetails,
+  getWatchHistory,
 } = require("../controllers/user.controller.js");
 const upload = require("../middlewares/multer.middleware.js");
 const verifyUser = require("../middlewares/user.middleware.js");
@@ -39,11 +41,15 @@ router.patch(
   updateProfile
 );
 router.patch("/update-account", verifyUser, updateAccount);
+router.patch("/update-email", verifyUser, updateEmail);
+router.patch("/update-username", verifyUser, updateUserName);
 
 router.delete("/remove-profile", verifyUser, removeProfile);
 router.delete("/delete-account", verifyUser, deleteAccount);
 
 router.get("/existing-user", getExistingUser);
 router.get("/see-profile", verifyUser, seeProfile);
+router.get("/user-profile-details", verifyUser, getUserProfileDetails);
+router.get("/watch-history", verifyUser, getWatchHistory);
 
 module.exports = router;

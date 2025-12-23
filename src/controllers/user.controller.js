@@ -29,15 +29,14 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new apiError(409, "User already exist");
   }
   try {
-    const profileLocalPath = req.files?.profile?.[0]?.path;
+    const profileLocalPath = req.file?.profile?.[0]?.path;
 
     if (!profileLocalPath) {
       throw new apiError(409, "Profile path is required");
     }
-
   } catch (error) {
     next(error);
-} 
+  }
 
   const profile = await uploadImgToCloudnary(profileLocalPath);
   if (!profile) {
@@ -205,12 +204,18 @@ const updateAccount = asyncHandler(async (req, res) => {
     throw new apiError(400, "All fields are required");
   }
 
+  const checkExistingUser = await User.findOne({userName});
+  if(checkExistingUser){
+    throw new apiError(400, "this usename is already taken")
+  }
+
   const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
       $set: {
         email,
         userName,
+        fullName
       },
     },
     { new: true }
@@ -308,7 +313,7 @@ const deleteAccount = asyncHandler(async (req, res) => {
   }
 
   const checkPassword = await user.isPasswordCorrect(password);
-  if (!changePassword) {
+  if (!checkPassword) {
     throw new apiError(400, "Incorrect Password");
   }
 
@@ -345,6 +350,8 @@ const seeProfile = asyncHandler(async (req, res) => {
     .status(200)
     .json(new apiResponse(200, user, "This is aother person's profile"));
 });
+
+
 
 const getUserProfileDetails = asyncHandler(async (req, res) => {
   const { userName } = req.params;
@@ -482,5 +489,6 @@ module.exports = {
   updateAccount,
   seeProfile,
   getUserProfileDetails,
-  getExistingUser,
+  getWatchHistory,
 };
+
