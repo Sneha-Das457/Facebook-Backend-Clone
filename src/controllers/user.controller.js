@@ -4,7 +4,7 @@ const asyncHandler = require("../utils/asyncHandler.js");
 const User = require("../models/user.model.js");
 const jwt = require("jsonwebtoken");
 const cloudnary = require("cloudinary").v2;
-const uploadImgToCloudnary = require("../config/cloudnary.js");
+const {uploadImgToCloudnary} = require("../config/cloudnary.js");
 const upload = require("../middlewares/multer.middleware.js");
 
 const generateAccessAndrefreshToken = async (userId) => {
@@ -28,14 +28,9 @@ const registerUser = asyncHandler(async (req, res) => {
   if (checkExistingUser) {
     throw new apiError(409, "User already exist");
   }
-  try {
-    const profileLocalPath = req.file?.profile?.[0]?.path;
-
-    if (!profileLocalPath) {
-      throw new apiError(409, "Profile path is required");
-    }
-  } catch (error) {
-    next(error);
+  const profileLocalPath = req.file?.path;
+  if (!profileLocalPath) {
+    throw new apiError(400, "Profile path is required");
   }
 
   const profile = await uploadImgToCloudnary(profileLocalPath);
@@ -204,9 +199,9 @@ const updateAccount = asyncHandler(async (req, res) => {
     throw new apiError(400, "All fields are required");
   }
 
-  const checkExistingUser = await User.findOne({userName});
-  if(checkExistingUser){
-    throw new apiError(400, "this usename is already taken")
+  const checkExistingUser = await User.findOne({ userName });
+  if (checkExistingUser) {
+    throw new apiError(400, "this usename is already taken");
   }
 
   const user = await User.findByIdAndUpdate(
@@ -215,7 +210,7 @@ const updateAccount = asyncHandler(async (req, res) => {
       $set: {
         email,
         userName,
-        fullName
+        fullName,
       },
     },
     { new: true }
@@ -350,8 +345,6 @@ const seeProfile = asyncHandler(async (req, res) => {
     .status(200)
     .json(new apiResponse(200, user, "This is aother person's profile"));
 });
-
-
 
 const getUserProfileDetails = asyncHandler(async (req, res) => {
   const { userName } = req.params;
@@ -491,4 +484,3 @@ module.exports = {
   getUserProfileDetails,
   getWatchHistory,
 };
-

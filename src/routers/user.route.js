@@ -18,16 +18,7 @@ const {
 const upload = require("../middlewares/multer.middleware.js");
 const verifyUser = require("../middlewares/user.middleware.js");
 
-router.post(
-  "/register",
-  upload.fields([
-    {
-      name: "profile",
-      maxCount: 1,
-    },
-  ]),
-  registerUser
-);
+router.post("/register", upload.single("profile"), registerUser);
 
 router.post("/login", loginUser);
 router.post("/logot", verifyUser, logoutUser);
@@ -41,8 +32,6 @@ router.patch(
   updateProfile
 );
 router.patch("/update-account", verifyUser, updateAccount);
-router.patch("/update-email", verifyUser, updateEmail);
-router.patch("/update-username", verifyUser, updateUserName);
 
 router.delete("/remove-profile", verifyUser, removeProfile);
 router.delete("/delete-account", verifyUser, deleteAccount);
