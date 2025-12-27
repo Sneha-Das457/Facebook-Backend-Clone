@@ -16,6 +16,8 @@ const uploadImgToCloudnary = async (localFilePath) => {
     const response = await cloudnary.uploader.upload(localFilePath, {
       resource_type: "image",
     });
+
+    return response;
   } catch (error) {
     console.log("Failed to upload", error.message);
     throw error;

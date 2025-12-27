@@ -19,6 +19,8 @@ const generateAccessAndrefreshToken = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, password, userName } = req.body;
+  //console.log("File : ", req.file);
+  //console.log("Body : ", req.body);
   if (!fullName || !email || !password || !userName) {
     throw new apiError(400, "All fields are required");
   }
@@ -35,7 +37,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const profile = await uploadImgToCloudnary(profileLocalPath);
   if (!profile) {
-    throw new apiError(409, "Profile file is required");
+    throw new apiError(409, "Failed to upload profile, try again later");
   }
 
   const user = await User.create({
