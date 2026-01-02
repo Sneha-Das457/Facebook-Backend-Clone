@@ -21,7 +21,7 @@ const verifyUser = require("../middlewares/user.middleware.js");
 router.post("/register", upload.single("profile"), registerUser);
 
 router.post("/login", loginUser);
-router.post("/logot", verifyUser, logoutUser);
+router.post("/logout", verifyUser, logoutUser);
 router.post("/refresh-token", refreshAccessToken);
 router.post("/change-password", verifyUser, changePassword);
 

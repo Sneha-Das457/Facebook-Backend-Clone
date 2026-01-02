@@ -15,6 +15,7 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
+      //Selection: false,
     },
     userName: {
       type: String,
@@ -37,9 +38,10 @@ const userSchema = new Schema(
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
+    next();
   }
 });
-userSchema.method.isPasswordCorrect = async function (password) {
+userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
@@ -52,7 +54,7 @@ userSchema.methods.generateAccessToken = function () {
 
     process.env.ACCESS_TOKEN,
     {
-      expiresIN: ACCESS_TOKEN_VALIDATION,
+      expiresIn: process.env.ACCESS_TOKEN_VALIDATION,
     }
   );
 };
@@ -65,7 +67,7 @@ userSchema.methods.generateRefreshToken = function () {
 
     process.env.REFRESH_TOKEN,
     {
-      expiresIN: REFRESH_TOKEN_VALIDATION,
+      expiresIn: process.env.REFRESH_TOKEN_VALIDATION,
     }
   );
 };

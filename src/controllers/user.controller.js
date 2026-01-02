@@ -4,7 +4,7 @@ const asyncHandler = require("../utils/asyncHandler.js");
 const User = require("../models/user.model.js");
 const jwt = require("jsonwebtoken");
 const cloudnary = require("cloudinary").v2;
-const {uploadImgToCloudnary} = require("../config/cloudnary.js");
+const { uploadImgToCloudnary } = require("../config/cloudnary.js");
 const upload = require("../middlewares/multer.middleware.js");
 
 const generateAccessAndrefreshToken = async (userId) => {
@@ -63,6 +63,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   const { userName, email, password } = req.body;
+
   if (!userName && !email) {
     throw new apiError(400, "Username and email is required");
   }
@@ -76,28 +77,23 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new apiError(400, "Password is incorrect");
   }
 
+  const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
   const { accessToken, refreshToken } = await generateAccessAndrefreshToken(
     user._id
   );
-  const loggedInUser = await User.findById(user._id).select(
-    "-password, -refreshToken"
-  );
+
   const option = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
   };
 
   return res
     .status(200)
     .cookie("refreshToken", refreshToken, option)
     .cookie("accessToken", accessToken, option)
-    .json(
-      new apiResponse(
-        200,
-        { use: loggedInUser, accessToken, refreshToken },
-        "Login successfull"
-      )
-    );
+    .json(new apiResponse(200, { user: loggedInUser }, "Login successfull"));
 });
 
 const getExistingUser = asyncHandler(async (req, res) => {
@@ -134,7 +130,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-  const receivedRefreshToken = req.cookie.refreshToken || req.body.refreshToken;
+  const receivedRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
   if (!receivedRefreshToken) {
     throw new apiError(404, "Unauthorized request");
   }
