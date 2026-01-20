@@ -52,7 +52,7 @@ userSchema.methods.generateAccessToken = function () {
       email: this.email,
     },
 
-    process.env.ACCESS_TOKEN,
+    process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: process.env.ACCESS_TOKEN_VALIDATION,
     }
@@ -65,7 +65,7 @@ userSchema.methods.generateRefreshToken = function () {
       _id: this.id,
     },
 
-    process.env.REFRESH_TOKEN,
+    process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: process.env.REFRESH_TOKEN_VALIDATION,
     }
