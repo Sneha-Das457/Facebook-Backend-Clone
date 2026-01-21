@@ -50,7 +50,7 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken"
+    "-password -refreshToken",
   );
   if (!createdUser) {
     throw new apiError(400, "Something went wrong, try again later");
@@ -77,10 +77,12 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new apiError(400, "Password is incorrect");
   }
 
-  const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken",
+  );
 
   const { accessToken, refreshToken } = await generateAccessAndrefreshToken(
-    user._id
+    user._id,
   );
 
   const option = {
@@ -114,7 +116,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     {
       $set: { refreshToken: undefined },
     },
-    { new: true }
+    { new: true },
   );
 
   const option = {
@@ -130,7 +132,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-  const receivedRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+  const receivedRefreshToken =
+    req.cookies?.refreshToken || req.body?.refreshToken;
   if (!receivedRefreshToken) {
     throw new apiError(404, "Unauthorized request");
   }
@@ -138,7 +141,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   try {
     const decodeToken = jwt.verify(
       receivedRefreshToken,
-      process.env.JWT_REFRESH_SECRET
+      process.env.REFRESH_TOKEN_SECRET,
     );
     const user = await User.findById(decodeToken._id);
     if (!user) {
@@ -151,25 +154,25 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const option = {
       httpOnly: true,
-      secure: true,
+      secure: false,
     };
 
-    const { accessToken, newRefreshToken } =
+    const { newaccessToken, newRefreshToken } =
       await generateAccessAndrefreshToken(user._id);
-
-      user.refreshToken = newRefreshToken;
-      await user.save({validateBeforeSave: false});
+    
+    user.refreshToken = newRefreshToken;
+    await user.save({ validateBeforeSave: false });
 
     return res
       .status(200)
-      .cookie("accessToken", accessToken, option)
+      .cookie("accessToken", newaccessToken, option)
       .cookie("refreshToken", newRefreshToken, option)
       .json(
         new apiResponse(
           200,
-          { accessToken, newRefreshToken },
-          "Access token is refreshed"
-        )
+          //{ newaccessToken},
+          "Access token is refreshed",
+        ),
       );
   } catch (error) {
     throw new apiError(500, error.message);
@@ -202,7 +205,7 @@ const updateAccount = asyncHandler(async (req, res) => {
 
   const checkExistingUser = await User.findOne({ userName });
   if (checkExistingUser) {
-    throw new apiError(400, "this usename is already taken");
+    throw new apiError(400, "this username is already taken");
   }
 
   const user = await User.findByIdAndUpdate(
@@ -214,7 +217,7 @@ const updateAccount = asyncHandler(async (req, res) => {
         fullName,
       },
     },
-    { new: true }
+    { new: true },
   ).select("-password");
 
   return res
@@ -223,8 +226,8 @@ const updateAccount = asyncHandler(async (req, res) => {
       new apiResponse(
         200,
         user,
-        "Your account details has been updated successfully"
-      )
+        "Your account details has been updated successfully",
+      ),
     );
 });
 
@@ -263,7 +266,7 @@ const updateProfile = asyncHandler(async (req, res) => {
         profilePublicId: profile.public_id,
       },
     },
-    { new: true }
+    { new: true },
   );
   return res
     .status(200)
@@ -317,7 +320,7 @@ const deleteAccount = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new apiResponse(200, deletedUser, "Account has been deleted sucessfully")
+      new apiResponse(200, deletedUser, "Account has been deleted sucessfully"),
     );
 });
 
@@ -328,7 +331,7 @@ const seeProfile = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findOne([{ userName }]).select(
-    "-password -email -refreshToken"
+    "-password -email -refreshToken",
   );
   if (!user) {
     throw new apiError(404, "User not found");
@@ -409,8 +412,8 @@ const getUserProfileDetails = asyncHandler(async (req, res) => {
       new apiResponse(
         200,
         profile,
-        "User's profile details has been fetched successfully"
-      )
+        "User's profile details has been fetched successfully",
+      ),
     );
 });
 
@@ -465,8 +468,8 @@ const getWatchHistory = asyncHandler(async (req, res) => {
       new apiResponse(
         200,
         user[0].watchHistory,
-        "User's watch history has been fetched successfully"
-      )
+        "User's watch history has been fetched successfully",
+      ),
     );
 });
 
