@@ -13,7 +13,7 @@ const verifyUser = asyncHandler(async (req, res, next) => {
       throw new apiError(400, "Access token is missing");
     }
 
-    const decodeToken = jwt.verify(token, process.env.ACCESS_TOKEN);
+    const decodeToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     const user = await User.findById(decodeToken._id).select(
       "-password -refreshToken"
     );

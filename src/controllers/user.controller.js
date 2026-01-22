@@ -111,6 +111,7 @@ const getExistingUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
+  console.log("Logout controller hit")
   await User.findByIdAndUpdate(
     req.user._id,
     {
@@ -198,18 +199,19 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 
 const updateAccount = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
   const { email, userName, fullName } = req.body;
   if (!email || !userName) {
     throw new apiError(400, "All fields are required");
   }
 
-  const checkExistingUser = await User.findOne({ userName });
-  if (checkExistingUser) {
-    throw new apiError(400, "this username is already taken");
+  const checkExistingUser = await User.findOne({ $or: [{ userName }, { email }] });
+  if (!checkExistingUser) {
+    throw new apiError(400, "User does not exist");
   }
 
   const user = await User.findByIdAndUpdate(
-    req.user?._id,
+    userId,
     {
       $set: {
         email,
