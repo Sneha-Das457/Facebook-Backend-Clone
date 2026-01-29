@@ -36,7 +36,7 @@ router.patch("/update-account", verifyUser, updateAccount);
 router.delete("/remove-profile", verifyUser, removeProfile);
 router.delete("/delete-account", verifyUser, deleteAccount);
 
-router.get("/existing-user", getExistingUser);
+router.get("/existing-user", verifyUser, getExistingUser);
 router.get("/see-profile", verifyUser, seeProfile);
 router.get("/user-profile-details", verifyUser, getUserProfileDetails);
 router.get("/watch-history", verifyUser, getWatchHistory);

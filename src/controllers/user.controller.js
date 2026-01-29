@@ -256,7 +256,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   }
 
   const profile = await uploadImgToCloudnary(profileLocalPath);
-  if (profile.secure_url || profile.public_id) {
+  if (!profile.secure_url || !profile.public_id) {
     throw new apiError(400, "Failed to upload image, try again later");
   }
 
