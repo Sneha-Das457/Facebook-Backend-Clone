@@ -36,7 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const profile = await uploadImgToCloudnary(profileLocalPath);
-  if (!profile) {
+  if (!profile.secure_url || !profile.public_id) {
     throw new apiError(409, "Failed to upload profile, try again later");
   }
 
@@ -111,7 +111,7 @@ const getExistingUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-  console.log("Logout controller hit")
+  console.log("Logout controller hit");
   await User.findByIdAndUpdate(
     req.user._id,
     {
@@ -160,7 +160,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const { newaccessToken, newRefreshToken } =
       await generateAccessAndrefreshToken(user._id);
-    
+
     user.refreshToken = newRefreshToken;
     await user.save({ validateBeforeSave: false });
 
@@ -205,7 +205,9 @@ const updateAccount = asyncHandler(async (req, res) => {
     throw new apiError(400, "All fields are required");
   }
 
-  const checkExistingUser = await User.findOne({ $or: [{ userName }, { email }] });
+  const checkExistingUser = await User.findOne({
+    $or: [{ userName }, { email }],
+  });
   if (!checkExistingUser) {
     throw new apiError(400, "User does not exist");
   }
@@ -248,7 +250,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   if (user.profilePublicId) {
     try {
       await cloudnary.uploader.destroy(user.profilePublicId, {
-        resource_type: Image,
+        resource_type: "image",
       });
     } catch (error) {
       throw new apiError(500, "Something went wrong during the process");
@@ -276,29 +278,43 @@ const updateProfile = asyncHandler(async (req, res) => {
 });
 
 const removeProfile = asyncHandler(async (req, res) => {
-  const profileLocalPath = req.file?.path;
-  if (!profileLocalPath) {
-    throw new apiError(404, "Profile is required!");
-  }
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user) {
     throw new apiError(404, "User does not exist!");
   }
 
-  if (user.profilePublicId) {
-    try {
-      await cloudnary.uploader.destroy(user.profilePublicId, {
-        resource_type: Image,
-      });
-    } catch (error) {
-      throw new apiError(500, "Something went wrong. Try again later");
-    }
+  if (!user.profilePublicId) {
+    throw new apiError(400, "There is no profile to remove");
   }
+  try {
+    await cloudnary.uploader.destroy(user.profilePublicId, {
+      resource_type: "image",
+    });
+  } catch (error) {
+    throw new apiError(500, "Something went wrong during the process");
+  }
+
+  const updateUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        profile: null,
+        profilePublicId: null,
+      },
+    },
+    { new: true },
+  );
 
   return res
     .status(200)
-    .json(new apiResponse(200, "Profile removed successfully"));
+    .json(
+      new apiResponse(
+        200,
+        updateUser,
+        "Your profile has been removed sucessfully",
+      ),
+    );
 });
 
 const deleteAccount = asyncHandler(async (req, res) => {
