@@ -295,26 +295,13 @@ const removeProfile = asyncHandler(async (req, res) => {
     throw new apiError(500, "Something went wrong during the process");
   }
 
-  const updateUser = await User.findByIdAndUpdate(
-    userId,
-    {
-      $set: {
-        profile: null,
-        profilePublicId: null,
-      },
-    },
-    { new: true },
-  );
+  user.profile = "";
+  user.profilePublicId = "";
+  await user.save({ validateBeforeSave: false });
 
   return res
     .status(200)
-    .json(
-      new apiResponse(
-        200,
-        updateUser,
-        "Your profile has been removed sucessfully",
-      ),
-    );
+    .json(new apiResponse(200, "Your profile has been removed sucessfully"));
 });
 
 const deleteAccount = asyncHandler(async (req, res) => {

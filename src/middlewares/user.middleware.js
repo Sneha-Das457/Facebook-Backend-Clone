@@ -8,7 +8,7 @@ const verifyUser = asyncHandler(async (req, res, next) => {
   try {
     const token =
       req.cookies?.accessToken ||
-      req.headers["authorization"]?.replace("Bearer", "").trim();
+      req.headers.authorization?.replace("Bearer ", "").trim();
     if (!token) {
       throw new apiError(400, "Access token is missing");
     }
