@@ -306,6 +306,10 @@ const removeProfile = asyncHandler(async (req, res) => {
 
 const deleteAccount = asyncHandler(async (req, res) => {
   const userId = req.user._id;
+
+  if(!req.body){
+    throw new apiError(404, "Request body is missing")
+  }
   const { password } = req.body;
   if (!password) {
     throw new apiError(404, "Password is required");
