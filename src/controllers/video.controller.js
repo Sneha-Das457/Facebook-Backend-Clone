@@ -11,7 +11,7 @@ const {
 const createVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
   if (!title || !description) {
-    throw new apiError(400, "These fields are required");
+    throw new apiError(400, "Title and description are required");
   }
 
   const videoFilePath = req.files?.videoFile?.[0]?.path;
@@ -24,13 +24,16 @@ const createVideo = asyncHandler(async (req, res) => {
     throw new apiError(400, "Thumbnail is required");
   }
 
+  let video, thumbnail;
+
   try {
     const video = await uploadVideoToCloudnary(videoFilePath);
+    console.log("Video upload response:", video);
     const thumbnail = await uploadImgToCloudnary(thumbnailLocalPath);
   } catch (error) {
     throw new apiError(
       500,
-      error.message || "Falide to upload, try again later"
+      error.message || "Falide to upload, try again later",
     );
   }
 
@@ -39,14 +42,14 @@ const createVideo = asyncHandler(async (req, res) => {
   if (!videoUrl) {
     throw new apiError(
       400,
-      "Failed to upload to video: Url is missing from cloudnary"
+      "Video upload failed: Url is missing from cloudnary response",
     );
   }
 
   if (!thumbnailUrl) {
     throw new apiError(
       400,
-      "Failed to upload image: Url is missing from cloudnary"
+      "Failed to upload image: Url is missing from cloudnary",
     );
   }
 
@@ -111,8 +114,8 @@ const gettAllVideos = asyncHandler(async (req, res) => {
       new apiResponse(
         200,
         video,
-        "All the videos has been fetched successfully"
-      )
+        "All the videos has been fetched successfully",
+      ),
     );
 });
 
@@ -158,7 +161,7 @@ const editVideo = asyncHandler(async (req, res) => {
     {
       $set: update,
     },
-    { new: true }
+    { new: true },
   );
 
   return res
@@ -167,8 +170,8 @@ const editVideo = asyncHandler(async (req, res) => {
       new apiResponse(
         200,
         updateVideo,
-        "Your video has been updated sucessfully"
-      )
+        "Your video has been updated sucessfully",
+      ),
     );
 });
 
@@ -192,7 +195,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
       throw new apiError(
         500,
         error.message,
-        "Failed to delete thumbnail from cloudnary"
+        "Failed to delete thumbnail from cloudnary",
       );
     }
   }
@@ -206,7 +209,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
       throw new apiError(
         500,
         error.message,
-        "Failed to delete video from cloudnary"
+        "Failed to delete video from cloudnary",
       );
     }
   }
@@ -231,7 +234,7 @@ const togglePublicStatus = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new apiResponse(200, video, "Published has been toggled successfully")
+      new apiResponse(200, video, "Published has been toggled successfully"),
     );
 });
 

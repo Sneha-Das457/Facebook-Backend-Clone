@@ -33,7 +33,10 @@ const uploadVideoToCloudnary = async (localFilePath) => {
   try {
     const response = await cloudnary.uploader.upload(localFilePath, {
       resource_type: "video",
+      chunk_size: 6000000, // 6mb
     });
+
+    return response;
   } catch (error) {
     console.log("Failed to upload", error.message);
   } finally {
