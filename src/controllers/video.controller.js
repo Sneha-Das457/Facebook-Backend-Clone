@@ -9,6 +9,8 @@ const {
 } = require("../config/cloudnary.js");
 
 const createVideo = asyncHandler(async (req, res) => {
+  console.log("BODY:", req.body);
+  console.log("FILES:", req.files);
   const { title, description } = req.body;
   if (!title || !description) {
     throw new apiError(400, "Title and description are required");
@@ -27,9 +29,9 @@ const createVideo = asyncHandler(async (req, res) => {
   let video, thumbnail;
 
   try {
-    const video = await uploadVideoToCloudnary(videoFilePath);
+    video = await uploadVideoToCloudnary(videoFilePath);
     console.log("Video upload response:", video);
-    const thumbnail = await uploadImgToCloudnary(thumbnailLocalPath);
+    thumbnail = await uploadImgToCloudnary(thumbnailLocalPath);
   } catch (error) {
     throw new apiError(
       500,
