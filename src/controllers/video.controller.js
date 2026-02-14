@@ -9,8 +9,8 @@ const {
 } = require("../config/cloudnary.js");
 
 const createVideo = asyncHandler(async (req, res) => {
-  console.log("BODY:", req.body);
-  console.log("FILES:", req.files);
+  //console.log("BODY:", req.body);
+  //console.log("FILES:", req.files);
   const { title, description } = req.body;
   if (!title || !description) {
     throw new apiError(400, "Title and description are required");
@@ -26,6 +26,9 @@ const createVideo = asyncHandler(async (req, res) => {
     throw new apiError(400, "Thumbnail is required");
   }
 
+  console.log("Video file path:", videoFilePath);
+  console.log("Thumbnail path:", thumbnailLocalPath);
+
   let video, thumbnail;
 
   try {
@@ -35,20 +38,20 @@ const createVideo = asyncHandler(async (req, res) => {
   } catch (error) {
     throw new apiError(
       500,
-      error.message || "Falide to upload, try again later",
+      error.message || "Failed to upload, try again later",
     );
   }
 
-  const videoUrl = video?.secure_url || video?.url;
-  const thumbnailUrl = thumbnail?.secure_url || thumbnail?.url;
-  if (!videoUrl) {
+  /*const videoUrl = video?.secure_url || video?.url;
+  const thumbnailUrl = thumbnail?.secure_url;*/
+  if (!video?.secure_url || !video?.url) {
     throw new apiError(
       400,
       "Video upload failed: Url is missing from cloudnary response",
     );
   }
 
-  if (!thumbnailUrl) {
+  if (!thumbnail?.secure_url || !thumbnail?.url) {
     throw new apiError(
       400,
       "Failed to upload image: Url is missing from cloudnary",
@@ -59,9 +62,9 @@ const createVideo = asyncHandler(async (req, res) => {
     title,
     description,
     videoFile: video?.secure_url || video.url,
-    videoFilePublicId: video?.public_id,
+    videoPublicId: video?.public_id,
     thumbnail: thumbnail?.secure_url || thumbnail.url,
-    thumbnailPublicId: thumbnail.public_id,
+    thumbnailPublicId: thumbnail?.public_id,
     user: req.user._id,
   });
 

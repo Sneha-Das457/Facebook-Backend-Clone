@@ -6,6 +6,8 @@ cloudnary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
   secure: true,
+  timeout: 600000
+  
 });
 
 const uploadImgToCloudnary = async (localFilePath) => {
@@ -28,17 +30,19 @@ const uploadImgToCloudnary = async (localFilePath) => {
 
 const uploadVideoToCloudnary = async (localFilePath) => {
   if (!localFilePath) {
+    console.log("No video file path recieved");
     return null;
   }
   try {
-    const response = await cloudnary.uploader.upload_large(localFilePath, {
+    const response = await cloudnary.uploader.upload(localFilePath, {
       resource_type: "video",
-      chunk_size: 6000000, // 6mb
+      //chunk_size: 6000000,
     });
 
     return response;
   } catch (error) {
     console.log("Failed to upload", error.message);
+    throw error;
   } finally {
     fs.existsSync(localFilePath) && fs.unlinkSync(localFilePath);
   }

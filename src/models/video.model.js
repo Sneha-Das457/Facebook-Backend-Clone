@@ -44,12 +44,12 @@ const videoSchema = new Schema(
     },
     isPublished: {
       type: Boolean,
-      required: true,
+      //required: true,
     },
 
     isLikeCountPublic: {
       type: Boolean,
-      required: true,
+      //required: true,
     },
   },
   { timestamps: true }
