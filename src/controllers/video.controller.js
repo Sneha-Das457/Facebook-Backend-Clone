@@ -3,6 +3,7 @@ const asyncHandler = require("../utils/asyncHandler.js");
 const apiError = require("../utils/apiError.js");
 const apiResponse = require("../utils/apiResponse.js");
 const Video = require("../models/video.model.js");
+const mongoose = require("mongoose");
 const {
   uploadImgToCloudnary,
   uploadVideoToCloudnary,
@@ -80,7 +81,11 @@ const createVideo = asyncHandler(async (req, res) => {
 const getVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   if (!videoId) {
-    throw new apiError(400, "Invalid video Id");
+    throw new apiError(400, "Video id is required");
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(videoId)) {
+    throw new apiError(400, "Invalid video id");
   }
 
   const video = await Video.findById(videoId);
@@ -90,7 +95,7 @@ const getVideo = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new apiResponse(200, "Video has been fetched successfully"));
+    .json(new apiResponse(200, video, "Video has been fetched successfully"));
 });
 
 const gettAllVideos = asyncHandler(async (req, res) => {
@@ -143,7 +148,7 @@ const editVideo = asyncHandler(async (req, res) => {
   if (video.thumbnailPublicId) {
     try {
       await cloudinary.uploader.destroy(video.thumbnailPublicId, {
-        resource_type: Image,
+        resource_type: "image",
       });
     } catch (error) {
       throw new apiError(500, error.message, "Failed to delete old image");
@@ -151,7 +156,7 @@ const editVideo = asyncHandler(async (req, res) => {
   }
 
   const newThumbnail = await uploadImgToCloudnary(newThumbnailFilePath);
-  if (newThumbnail.secure_url) {
+  if (!newThumbnail?.secure_url) {
     throw new apiError(500, "Failed to upload new thumbnail");
   }
 
@@ -194,7 +199,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
   if (video.thumbnailPublicId) {
     try {
       await cloudinary.uploader.destroy(video.thumbnailPublicId, {
-        resource_type: Image,
+        resource_type: "image",
       });
     } catch (error) {
       throw new apiError(
@@ -208,7 +213,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
   if (video.videoPublicId) {
     try {
       await cloudinary.uploader.destroy(video.videoPublicId, {
-        resource_type: video,
+        resource_type: "video",
       });
     } catch (error) {
       throw new apiError(
