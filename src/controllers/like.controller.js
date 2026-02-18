@@ -4,10 +4,15 @@ const Comment = require("../models/comment.model.js");
 const asyncHandler = require("../utils/asyncHandler.js");
 const apiResponse = require("../utils/apiResponse.js");
 const apiError = require("../utils/apiError.js");
+const mongoose = require("mongoose");
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const userId = req.user._id;
+
+  if (!mongoose.Types.ObjectId.isValid(videoId)) {
+    throw new apiError(400, "Invalid video ID");
+  }
 
   const video = await Video.findById(videoId);
   if (!video) {
@@ -78,10 +83,10 @@ const toggleLikePublicStatus = asyncHandler(async (req, res) => {
     throw new apiError(400, "Video not found");
   }
 
-  if (video.owner.toString() !== userId) {
+  if (video.owner.toString() !== userId.toString()) {
     throw new apiError(
       400,
-      "You are not the owner, you can not change the visibility"
+      "You are not the owner, you can not change the visibility",
     );
   }
 
@@ -93,8 +98,8 @@ const toggleLikePublicStatus = asyncHandler(async (req, res) => {
     .json(
       new apiResponse(
         200,
-        "Your video's like count visibility has been updated successfully"
-      )
+        "Your video's like count visibility has been updated successfully",
+      ),
     );
 });
 
@@ -103,7 +108,7 @@ const fetchLikedVideos = asyncHandler(async (req, res) => {
 
   const videos = await Like.find({ user: userId }).populate(
     "user",
-    "userName, email"
+    "userName, email",
   );
   if (videos.length === 0) {
     throw new apiError(404, "No videos found");
@@ -112,7 +117,7 @@ const fetchLikedVideos = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new apiResponse(200, videos, "All liked has been fetched successfully")
+      new apiResponse(200, videos, "All liked has been fetched successfully"),
     );
 });
 
