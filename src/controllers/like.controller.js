@@ -21,20 +21,17 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
   const existLike = await Like.findOne({
     video: videoId,
-    user: userId,
+    likedBy: req.user._id,
   });
 
   if (existLike) {
-    await Like.findOne({
-      _id: existLike._id,
-    });
-
+    await Like.findByIdAndDelete(existLike._id);
     return res.status(200).json(new apiResponse(200, null, "Unlike the video"));
   }
 
   await Like.create({
     video: videoId,
-    user: userId,
+    likedBy: req.user._id,
   });
 
   return res
@@ -104,12 +101,17 @@ const toggleLikePublicStatus = asyncHandler(async (req, res) => {
 });
 
 const fetchLikedVideos = asyncHandler(async (req, res) => {
-  const user = req.use._id;
+  console.log(req.user._id);
 
-  const videos = await Like.find({ user: userId }).populate(
-    "user",
-    "userName, email",
+  if (!req.user) {
+    throw new apiError(401, "User not authenticated");
+  }
+  const userId = req.user._id;
+  const videos = await Like.find({ likedBy: userId }).populate(
+    "video",
+    "title description thumbnail",
   );
+
   if (videos.length === 0) {
     throw new apiError(404, "No videos found");
   }
@@ -117,7 +119,11 @@ const fetchLikedVideos = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new apiResponse(200, videos, "All liked has been fetched successfully"),
+      new apiResponse(
+        200,
+        videos,
+        "All liked videos has been fetched successfully",
+      ),
     );
 });
 

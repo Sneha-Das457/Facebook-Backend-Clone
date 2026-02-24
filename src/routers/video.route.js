@@ -24,7 +24,7 @@ router.post(
       maxCount: 1,
     },
   ]),
-  createVideo
+  createVideo,
 );
 
 router.get("/all-videos", verifyUser, gettAllVideos);
@@ -33,7 +33,7 @@ router.put(
   "/edit-video/:videoId",
   verifyUser,
   upload.single("thumbnail"),
-  editVideo
+  editVideo,
 );
 router.patch("/toggle-public-status/:videoId", verifyUser, togglePublicStatus);
 router.delete("/delet-video/:videoId", verifyUser, deleteVideo);

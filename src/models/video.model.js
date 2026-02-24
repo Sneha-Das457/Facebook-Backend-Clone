@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 
-
 const videoSchema = new Schema(
   {
     owner: {
@@ -53,7 +52,7 @@ const videoSchema = new Schema(
       //required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 videoSchema.plugin(aggregatePaginate);

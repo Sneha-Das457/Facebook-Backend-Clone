@@ -8,6 +8,7 @@ const {
   uploadImgToCloudnary,
   uploadVideoToCloudnary,
 } = require("../config/cloudnary.js");
+const Like = require("../models/like.model.js");
 
 const createVideo = asyncHandler(async (req, res) => {
   //console.log("BODY:", req.body);
@@ -66,7 +67,7 @@ const createVideo = asyncHandler(async (req, res) => {
     videoPublicId: video?.public_id,
     thumbnail: thumbnail?.secure_url || thumbnail.url,
     thumbnailPublicId: thumbnail?.public_id,
-    user: req.user._id,
+    owner: req.user._id,
   });
 
   if (!uploadVideo) {
@@ -93,9 +94,24 @@ const getVideo = asyncHandler(async (req, res) => {
     throw new apiError(401, "Video not found!");
   }
 
+  const totalLikes = await Like.countDocuments({
+    video: videoId,
+  });
+
+  const isLiked = await Like.findOne({
+    video: videoId,
+    likedBy: req.user._id,
+  });
+
   return res
     .status(200)
-    .json(new apiResponse(200, video, "Video has been fetched successfully"));
+    .json(
+      new apiResponse(
+        200,
+        { ...video.toObject(), totalLikes, isLiked },
+        "Video has been fetched successfully",
+      ),
+    );
 });
 
 const gettAllVideos = asyncHandler(async (req, res) => {

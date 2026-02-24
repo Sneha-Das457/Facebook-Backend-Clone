@@ -3,26 +3,22 @@ const Schema = mongoose.Schema;
 
 const likeSchema = new Schema(
   {
-    Like: {
-      type: Number,
-      default: 0,
-      required: true,
-    },
-
     video: {
       type: Schema.Types.ObjectId,
       ref: "Video",
+      required: true,
     },
     likedBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     comment: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 const Like = mongoose.model("Like", likeSchema);
 module.exports = Like;
