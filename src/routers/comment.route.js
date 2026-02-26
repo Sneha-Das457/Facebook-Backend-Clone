@@ -4,6 +4,8 @@ const verifyUser = require("../middlewares/user.middleware.js");
 const {
   addComment,
   editComment,
+  getcomment,
+  getAllComments,
   deleteComment,
   disabeledCommentSection,
 } = require("../controllers/comment.controller.js");
@@ -15,6 +17,8 @@ router.patch(
   verifyUser,
   disabeledCommentSection
 );
+router.get("/get-comment/:commentId", getcomment);
+router.get("/get-all-comments", getAllComments);
 router.delete("/delete-comment/:commentId", verifyUser, deleteComment);
 
 module.exports = router;

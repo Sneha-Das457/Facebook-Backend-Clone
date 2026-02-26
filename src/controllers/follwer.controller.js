@@ -2,29 +2,40 @@ const Follwer = require("../models/follower.model");
 const asyncHandler = require("../utils/asyncHandler.js");
 const apiError = require("../utils/apiError.js");
 const apiResponse = require("../utils/apiResponse.js");
+const { default: mongoose } = require("mongoose");
 
 const toggleFollwers = asyncHandler(async (req, res) => {
   const { profileId } = req.params;
-  const { followerId } = req.user._id;
+  const follwerId = req.user._id;
 
-  if (profileId.toString() === followerId.toString()) {
+
+  if(!profileId || !follwerId){
+    throw new apiError(400, "Id's are required");
+  }
+
+  if (profileId.toString() === follwerId.toString()) {
     throw new apiError(400, "This is your own Id, you can't follow it");
   }
 
   const existFollwer = await Follwer.findOne({
-    follwer: follwerId,
-    profile: profileId,
+    follwedBy: follwerId,
+    follwedProfile: profileId,
   });
 
   if (existFollwer) {
     await Follwer.deleteOne({
       _id: existFollwer._id,
     });
-
     return res
       .status(200)
       .json(new apiResponse(200, null, "You unfollwed this account"));
   }
+
+
+  await Follwer.create({
+    follwedBy: follwerId,
+    follwedProfile: profileId,
+  })
 
   return res
     .status(200)
@@ -34,23 +45,26 @@ const toggleFollwers = asyncHandler(async (req, res) => {
 const getProfileFollwers = asyncHandler(async (req, res) => {
   const { profileId } = req.params;
 
-  const followers = await Follwer.find({ profile: profileId }).populate(
-    "follwer",
-    "user"
-  );
-
-  if (followers.length === 0) {
-    throw new apiError(400, null, "This profile has no follwers");
+  if(!profileId){
+    throw new apiError(400, "Profile id is required")
   }
+
+  const followers = await Follwer.find({ 
+    follwedBy: new mongoose.Types.ObjectId(profileId)
+   }).populate(
+    "follwedBy",
+    //"fullname username profile" ,
+
+  );
 
   return res
     .status(200)
     .json(
       new apiResponse(
         200,
-        null,
-        "this profile's follwers has been fetch successfully"
-      )
+        followers,
+        "this profile's follwers has been fetch successfully",
+      ),
     );
 });
 
@@ -71,8 +85,8 @@ const getFollwingAccounts = asyncHandler(async (req, res) => {
       new apiResponse(
         200,
         follwingAccounts,
-        "All the follwed Accounts has been fetch successfully"
-      )
+        "All the follwed Accounts has been fetch successfully",
+      ),
     );
 });
 

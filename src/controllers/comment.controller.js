@@ -80,17 +80,12 @@ const editComment = asyncHandler(async (req, res) => {
 });
 
 const getcomment = asyncHandler(async (req, res) => {
-  const { videoId } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(videoId)) {
-    throw new apiError(400, "Invalid video id");
+  const { commentId } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(commentId)) {
+    throw new apiError(400, "Invalid comment id");
   }
 
-  const video = await Video.findById(videoId);
-  if (!video) {
-    throw new apiError(400, "Video not found");
-  }
-
-  const comment = await Comment.find({ video: videoId }).populate(
+  const comment = await Comment.findById(commentId).populate(
     "commentBy",
     "name email ",
   );
@@ -111,7 +106,7 @@ const getcomment = asyncHandler(async (req, res) => {
 });
 
 const getAllComments = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, commentId } = req.query;
+  const { page = 1, limit = 10, commentId, query } = req.query;
   const sortBy = req.query.sortBy || "createdAt";
   const sortType = req.query.sortType === "asc" ? 1 : -1;
 
@@ -194,12 +189,17 @@ const disabeledCommentSection = asyncHandler(async (req, res) => {
   video.turnedOffComment = !video.turnedOffComment;
   await video.save();
 
+
+  await Comment.updateMany(
+    {video: videoId},
+    { $set: { turnedOffComment: video.turnedOffComment}},
+  );
+
   return res
     .status(200)
     .json(
       new apiResponse(
         200,
-        null,
         "The comment section of this video has been turned off successfully",
       ),
     );

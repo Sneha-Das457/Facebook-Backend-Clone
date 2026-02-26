@@ -3,23 +3,22 @@ const Schema = mongoose.Schema;
 
 const followerSchema = new Schema(
   {
-    follwer: {
-      type: Number,
-      default: 0,
-    },
-
-    profile: {
+    follwedBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
 
-    follwing: {
-      type: Number,
-      default: 0,
+    follwedProfile: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
+
+followerSchema.index({ follwedBy: 1, follwedProfile: 1 }, { unique: true });
 
 const Follwer = mongoose.model("Follwer", followerSchema);
 module.exports = Follwer;
