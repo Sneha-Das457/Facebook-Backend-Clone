@@ -6,7 +6,7 @@ const likeSchema = new Schema(
     video: {
       type: Schema.Types.ObjectId,
       ref: "Video",
-      required: true,
+      //required: true,
     },
     likedBy: {
       type: Schema.Types.ObjectId,
@@ -15,7 +15,7 @@ const likeSchema = new Schema(
     },
     comment: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Comment",
     },
   },
   { timestamps: true },

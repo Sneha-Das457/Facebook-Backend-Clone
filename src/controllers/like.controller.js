@@ -40,17 +40,17 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 });
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
-  const { CommentId } = req.params;
+  const { commentId } = req.params;
   const userId = req.user._id;
 
-  const comment = await Comment.findById(CommentId);
+  const comment = await Comment.findById(commentId);
   if (!comment) {
     throw new apiError(400, "Comment not found");
   }
 
   const existLikedCommemt = await Like.findOne({
-    video: videoId,
-    comment: CommentId,
+    user: userId,
+    comment: commentId,
   });
 
   if (existLikedCommemt) {
@@ -60,15 +60,15 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
     return res
       .status(200)
-      .json(new apiResponse(200, null, "Unlike the commet"));
+      .json(new apiResponse(200, null, "You disliked the comment"));
   }
 
   await Like.create({
-    user: userId,
-    comment: CommentId,
+    likedBy: userId,
+    comment: commentId,
   });
 
-  res.status(200).json(new apiResponse(200, null, "Liked the comment"));
+  res.status(200).json(new apiResponse(200, null, "You liked the comment"));
 });
 
 const toggleLikePublicStatus = asyncHandler(async (req, res) => {

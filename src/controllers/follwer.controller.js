@@ -50,10 +50,10 @@ const getProfileFollwers = asyncHandler(async (req, res) => {
   }
 
   const followers = await Follwer.find({ 
-    follwedBy: new mongoose.Types.ObjectId(profileId)
+    follwedProfile: new mongoose.Types.ObjectId(profileId)
    }).populate(
     "follwedBy",
-    //"fullname username profile" ,
+    "fullName userName" ,
 
   );
 
@@ -69,11 +69,11 @@ const getProfileFollwers = asyncHandler(async (req, res) => {
 });
 
 const getFollwingAccounts = asyncHandler(async (req, res) => {
-  const { follwerID } = req.user._id;
+  const  follwerID  = req.user._id;
 
   const follwingAccounts = await Follwer.find({
-    follwer: follwingID,
-  }).populate("follwer", "username");
+    follwedBy: follwerID,
+  }).populate("follwedProfile", "fullName userName");
 
   if (follwingAccounts.length === 0) {
     throw new apiError(400, "You haven't follwed any accounts yet..");
