@@ -8,6 +8,7 @@ const videoRoute = require("./src/routers/video.route.js");
 const follwerRoute = require("./src/routers/follwer.route.js");
 const likeRoute = require("./src/routers/like.route.js");
 const commentRoute = require("./src/routers/comment.route.js");
+const shareRoute = require("./src/routers/share.route.js");
 const apiResponse = require("./src/utils/apiResponse.js");
 
 const port = process.env.PORT || 9000;
@@ -22,6 +23,7 @@ app.use("/videos", videoRoute);
 app.use("/follwers", follwerRoute);
 app.use("/likes", likeRoute);
 app.use("/comments", commentRoute);
+app.use("/shares", shareRoute);
 
 connectDB()
   .then(() => {
